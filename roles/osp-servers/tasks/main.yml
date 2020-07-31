@@ -17,7 +17,6 @@
     meta: "{{ item.1 }}"
     userdata: |
       #!/bin/bash
-
       curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
       cat /tmp/internal.repo >> /etc/yum.repos.d/internal.repo
   with_subelements: 
