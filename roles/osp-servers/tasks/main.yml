@@ -45,5 +45,5 @@
   authorized_key:
     user: cloud-user
     state: present
-    key: "{{ lookup('file', '/root/.ssh/openstack.pub') }}"
+    key: "http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub"
   with_items: "{{ result.openstack_servers }}"
