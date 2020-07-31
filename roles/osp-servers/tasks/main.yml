@@ -1,3 +1,47 @@
 ---
 
-# tasks file for osp.servers
+# Create Instances
+- name: Create instances
+  os_server:
+    cloud: openstack
+    name: "{{ item.value.name }}"
+    state: "{{ item.value.state }}"
+    image: "{{ item.value.image }}"
+    key_name: "{{ item.value.key_name }}"
+    flavor: "{{ item.value.flavor }}"
+    security_groups: "{{ item.value.security_group }}"
+    delete_fip: yes
+    wait: no
+    nics:
+      - net-name: int_network
+    meta: "{{ item.value.meta }}"
+    userdata: |
+      #!/bin/bash
+      curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
+      cp /tmp/internal.repo /etc/yum.repos.d/internal.repo
+  with_dict: "{{ osp_servers }}"
+
+- name: Add floating IP to instance
+  os_floating_ip:
+    cloud: openstack
+    state: "{{ item.value.state }}"
+    reuse: yes
+    server: "{{ item.value.name }}"
+    network: ext_network
+    wait: true
+    timeout: 200
+  with_dict: "{{ osp_servers}}"
+
+
+# Send pub key to each instances
+- name: OpenStack servers
+  os_server_info:
+    cloud: openstack
+  register: result
+
+- name: Set authorized key taken from file
+  authorized_key:
+    user: cloud-user
+    state: present
+    key: "{{ lookup('file', '/root/.ssh/openstack.pub') }}"
+  with_items: "{{ result.openstack_servers }}"

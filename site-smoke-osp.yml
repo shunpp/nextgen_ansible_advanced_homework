@@ -2,7 +2,17 @@
   gather_facts: false
   tasks:
   - name: OpenStack servers
+    os_server_info:
+      cloud: openstack
+      server: frontend*
+    register: result
+
   - name: Curl website
+    uri: 
+      url: "http://{{ item.public_v4 }}"
+      return_content: yes
+      status_code: 200
+    with_items: "{{ result.openstack_servers }}"
 
   - name: Fail if 'Ansible has done its job' is not in the page content
     fail:
