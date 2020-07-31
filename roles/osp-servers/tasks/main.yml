@@ -14,7 +14,7 @@
     wait: no
     nics:
       - net-name: int_network
-    meta: "{{ item.value.meta }}"
+    meta: {{ item.value.meta }}
     userdata: |
       #!/bin/bash
       curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
