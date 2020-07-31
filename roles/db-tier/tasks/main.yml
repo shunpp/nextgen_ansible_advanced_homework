@@ -1,0 +1,30 @@
+---
+# tasks file for db-tier
+- name: install {{ package_name }}
+  package:
+    name: "{{ package_name }}"
+    state: latest
+
+- name: enable {{ package_name }} at boot
+  service:
+    name: "{{ service_name }}"
+    enabled: yes
+      
+- name: check PG_VERSION
+  stat:
+    path: /var/lib/pgsql/data/PG_VERSION
+  register: pg_version
+  
+- name: initilize postgres
+  command: postgresql-setup initdb
+  when: pg_version.stat.exists == false
+
+- name: Enable service {{ package_name }}, and not touch the state
+  service:
+    name: "{{ service_name }}"
+    enabled: yes
+
+- name: start {{ package_name }}
+  service:
+    name: "{{ service_name }}"
+    state: started
