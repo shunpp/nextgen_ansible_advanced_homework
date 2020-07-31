@@ -4,22 +4,24 @@
 - name: Create instances
   os_server:
     cloud: openstack
-    name: "{{ item.value.name }}"
-    state: "{{ item.value.state }}"
-    image: "{{ item.value.image }}"
-    key_name: "{{ item.value.key_name }}"
-    flavor: "{{ item.value.flavor }}"
-    security_groups: "{{ item.value.security_group }}"
+    name: "{{ item.0.name }}"
+    state: "{{ item.0.state }}"
+    image: "{{ item.0.image }}"
+    key_name: "{{ item.0.key_name }}"
+    flavor: "{{ item.0.flavor }}"
+    security_groups: "{{ item.0.security_group }}"
     delete_fip: yes
     wait: no
     nics:
       - net-name: int_network
-    meta: {{ item.value.meta }}
+    meta: "{{ item.1.meta }}"
     userdata: |
       #!/bin/bash
       curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
       cp /tmp/internal.repo /etc/yum.repos.d/internal.repo
-  with_dict: "{{ osp_servers }}"
+  with_subelements: 
+    - "{{ osp_servers }}"
+    - meta
 
 - name: Add floating IP to instance
   os_floating_ip:
